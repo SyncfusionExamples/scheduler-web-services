@@ -24,9 +24,27 @@ namespace ej2_web_api_crud.Controllers
 
         [HttpGet]
         [EnableQuery]
-        public IActionResult Get()
+        public IActionResult Get([FromQuery] Params @params)
         {
-            return Ok(dbContext.Events);
+            var query = dbContext.Events.AsQueryable();
+
+            if (@params is not null && (@params.StartDate.HasValue || @params.EndDate.HasValue))
+            {
+
+                DateTime start = @params.StartDate ?? DateTime.MinValue;
+                DateTime end = @params.EndDate ?? DateTime.MaxValue;
+
+                if (@params.StartDate.HasValue && @params.EndDate.HasValue &&
+                    @params.StartDate.Value.Date == @params.EndDate.Value.Date)
+                {
+                    start = @params.StartDate.Value.Date;
+                    end = start.AddDays(1).AddTicks(-1);
+                }
+
+                query = query.Where(e => e.EndTime >= start && e.StartTime <= end);
+            }
+
+            return Ok(query);
         }
 
         [HttpPost]
@@ -40,7 +58,7 @@ namespace ej2_web_api_crud.Controllers
         public async Task Put([FromODataUri] int key, [FromBody] Event events)
         {
             var entity = await dbContext.Events.FindAsync(events.Id);
-            if(entity != null)
+            if (entity != null)
             {
                 dbContext.Entry(entity).CurrentValues.SetValues(events);
                 await dbContext.SaveChangesAsync();
@@ -51,7 +69,7 @@ namespace ej2_web_api_crud.Controllers
         public async Task Patch([FromODataUri] int key, [FromBody] Event events)
         {
             var entity = await dbContext.Events.FindAsync(key);
-            if(entity != null)
+            if (entity != null)
             {
                 dbContext.Entry(entity).CurrentValues.SetValues(events);
                 await dbContext.SaveChangesAsync();
@@ -61,7 +79,7 @@ namespace ej2_web_api_crud.Controllers
         public async Task Delete([FromODataUri] int key)
         {
             var app = dbContext.Events.Find(key);
-            if(app != null)
+            if (app != null)
             {
                 dbContext.Events.Remove(app);
                 await dbContext.SaveChangesAsync();
