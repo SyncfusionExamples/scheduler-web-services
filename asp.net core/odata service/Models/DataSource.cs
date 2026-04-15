@@ -108,7 +108,7 @@
                 Location = "Space Centre USA",
                 StartTime = new DateTime(2022, 12, 13, 11, 0, 0),
                 EndTime = new DateTime(2022, 12, 13, 13, 0, 0),
-                PersonId = 7
+                PersonId = 3
             };
             _eventsData.Add(events);
 
