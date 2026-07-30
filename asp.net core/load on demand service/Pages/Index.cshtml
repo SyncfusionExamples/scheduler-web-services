@@ -1,0 +1,11 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<ejs-schedule id="schedule" height="550">
+    <e-schedule-eventsettings>
+        <e-data-manager url="/Index?handler=LoadData" crudUrl="/Index?handler=UpdateData" adaptor="UrlAdaptor"></e-data-manager>
+    </e-schedule-eventsettings>
+</ejs-schedule>
