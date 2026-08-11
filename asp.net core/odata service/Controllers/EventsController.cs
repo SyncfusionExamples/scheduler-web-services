@@ -24,9 +24,23 @@ namespace ej2_web_api_crud.Controllers
 
         [HttpGet]
         [EnableQuery]
-        public IActionResult Get()
+        public IActionResult Get([FromQuery] Params @params)
         {
-            return Ok(dbContext.Events);
+
+            var query = dbContext.Events.AsQueryable();
+
+            if (@params?.StartDate != null || @params?.EndDate != null)
+            {
+                DateTime start = @params.StartDate?.Date ?? DateTime.MinValue;
+                DateTime endExclusive = @params.EndDate?.Date.AddDays(1) ?? DateTime.MaxValue;
+
+                query = query.Where(e =>
+                    e.EndTime >= start &&
+                    e.StartTime < endExclusive);
+            }
+
+            return Ok(query);
+
         }
 
         [HttpPost]
